@@ -22,13 +22,14 @@ $(document).ready(function(){
 
    $entries = $("#entries");
    $subTotal = $('#subtotal');
+   $salesTax = $("#salestax");
+   $total = $("#total");
 
   myUtils.myEach(line_items, function(v,i){
     addItem(v.price, v.description, v.qty);
   });
 
   updateSubTotal();
-
 
 });
 
@@ -45,7 +46,38 @@ function addItem(price, title, quantity) {
 }
 
 function updateSubTotal() {
-// Refactor this using our helper functions :D
-  var subTotalPrice = 0; // !! That won't do! Calculate the actual subtotal.
-  $subTotal.text("$" + price); 
+  var subTotalPrice = 0;
+  subTotalPrice = myUtils.myReduce(line_items, function(val,v) {   
+   return val + (v.price*v.qty);
+  });
+  $subTotal.text("$" + subTotalPrice); 
+  salesTax(subTotalPrice);
 }
+
+function salesTax(subTotalPrice) {
+  var salesTax = subTotalPrice*.0725;
+  $salesTax.text("$" + salesTax);
+  updateTotal(subTotalPrice, salesTax);
+}
+
+function updateTotal(subTotalPrice, salesTax) {
+  var updateTotal = subTotalPrice + Math.floor(salesTax);
+  $total.text("$" + updateTotal);
+}
+
+/*I couldn't figure out how to sort this.  receipt wouldn't
+  return an array, therefore I couldn't sort it.
+*/
+function sortReceipt() {
+  var receipt = myUtils.myEach(line_items, function(val) {
+    return val.description;
+  })
+  receipt.sort(function(a, b) {
+    return a - b;
+  });
+  console.log(receipt);
+}
+
+
+
+
